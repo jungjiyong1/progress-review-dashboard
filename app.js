@@ -1004,12 +1004,47 @@
     </div>`;
   }
 
+  function parsePageRange(page) {
+    const clean = String(page || "").replace(/^p/i, "");
+    const [startText, endText] = clean.split("-");
+    const start = Number(startText);
+    const end = Number(endText || startText);
+    if (!Number.isInteger(start) || !Number.isInteger(end)) return null;
+    return { start, end };
+  }
+
+  function formatPageRange(range) {
+    if (range.start === range.end) return `p.${range.start}`;
+    return `p.${range.start}~${range.end}`;
+  }
+
+  function formatWanjaPages(unit) {
+    const ranges = (unit?.wanjaHomework?.pages || []).map(parsePageRange).filter(Boolean);
+    if (!ranges.length) return "";
+    const merged = [];
+    ranges
+      .sort((a, b) => a.start - b.start || a.end - b.end)
+      .forEach((range) => {
+        const last = merged[merged.length - 1];
+        if (last && range.start <= last.end + 1) {
+          last.end = Math.max(last.end, range.end);
+          return;
+        }
+        merged.push({ ...range });
+      });
+    return merged.map(formatPageRange).join(", ");
+  }
+
   function homeworkLineForEvent(event) {
-    if (event.homeworkMessage) return event.homeworkMessage;
-    if (event.materialName === "기출픽") return `기출픽 ${event.unitCode}강 프린트 자료`;
-    if (event.materialName === "셀파") return `셀파 ${event.unitCode}강 프린트 자료`;
+    if (event.materialName === "완자 내신만점 문제 + 실력 UP") {
+      const unit = unitById(COURSE, event.unitId);
+      const pages = formatWanjaPages(unit);
+      return `완자 ${event.unitCode}강${pages ? ` ${pages}` : ""} 풀기`;
+    }
+    if (event.materialName === "기출픽") return `기출픽 ${event.unitCode}강 프린트 풀기`;
+    if (event.materialName === "셀파") return `셀파 ${event.unitCode}강 프린트 풀기`;
     if (event.materialName === "실전대비북 + 완자 마무리") {
-      return `실전대비북 ${event.unitCode}강 + 완자 마무리 프린트 자료`;
+      return `실전대비북 ${event.unitCode}강 + 완자 마무리 프린트 풀기`;
     }
     return `${event.unitCode}강 ${event.studentLabel || event.materialName}`;
   }
@@ -1019,13 +1054,13 @@
     const lines = reviews.map(homeworkLineForEvent);
 
     if (week.type === "examPrep" && week.examPrepMaterials.length) {
-      const examPrepLines = week.examPrepMaterials.map((item) => `실전대비북 ${item.unitCode}강 + 완자 마무리 프린트 자료`);
+      const examPrepLines = week.examPrepMaterials.map((item) => `실전대비북 ${item.unitCode}강 + 완자 마무리 프린트 풀기`);
       examPrepLines.forEach((line) => {
         if (!lines.includes(line)) lines.push(line);
       });
     }
 
-    const title = `[${section.name} ${week.week}주차 숙제]`;
+    const title = "[숙제]";
     if (!lines.length) return `${title}\n숙제 없음`;
     return `${title}\n${lines.map((line, index) => `${index + 1}. ${line}`).join("\n")}`;
   }
