@@ -17,24 +17,21 @@
   const REVIEW_SCHEDULE = {
     D3: [
       { offset: 0, type: "wanja" },
-      { offset: 1, type: "gichulOdd" },
-      { offset: 2, type: "gichulEven" },
+      { offset: 1, type: "gichul" },
       { offset: 4, type: "selpa" },
       { offset: 7, type: "examPrep" },
       { offset: 11, type: "examPrep" },
     ],
     D2: [
       { offset: 0, type: "wanja" },
-      { offset: 1, type: "gichulOdd" },
-      { offset: 2, type: "gichulEven" },
+      { offset: 1, type: "gichul" },
       { offset: 4, type: "selpa" },
       { offset: 7, type: "examPrep" },
       { offset: 11, type: "examPrep" },
     ],
     D1: [
       { offset: 0, type: "wanja" },
-      { offset: 1, type: "gichulOdd" },
-      { offset: 2, type: "gichulEven" },
+      { offset: 1, type: "gichul" },
       { offset: 4, type: "selpa" },
       { offset: 11, type: "examPrep" },
     ],
@@ -341,9 +338,8 @@
   function reviewTypeForRound(round, reviewType) {
     if (reviewType) return reviewType;
     if (round === 1) return "wanja";
-    if (round === 2) return "gichulOdd";
-    if (round === 3) return "gichulEven";
-    if (round === 4) return "selpa";
+    if (round === 2) return "gichul";
+    if (round === 3) return "selpa";
     return "examPrep";
   }
 
@@ -389,35 +385,18 @@
       };
     }
 
-    if (type === "gichulOdd") {
+    if (type === "gichul") {
       return {
         label: "2차 복습",
-        materialName: "기출픽 홀수번",
-        studentLabel: "기출픽 홀수번 프린트 자료",
+        materialName: "기출픽",
+        studentLabel: "기출픽 프린트 자료",
         homeworkMessage: "",
         items: [
           {
             book: "기출픽",
             folder: course.folders.gichul,
             file: unit.resources.gichul,
-            detail: "홀수번만 풀이",
-          },
-        ],
-      };
-    }
-
-    if (type === "gichulEven") {
-      return {
-        label: "3차 복습",
-        materialName: "기출픽 짝수번",
-        studentLabel: "기출픽 짝수번 프린트 자료",
-        homeworkMessage: "",
-        items: [
-          {
-            book: "기출픽",
-            folder: course.folders.gichul,
-            file: unit.resources.gichul,
-            detail: "짝수번만 풀이",
+            detail: "프린트 자료",
           },
         ],
       };
@@ -598,9 +577,9 @@
 
       if (!normalRounds.includes(1)) {
         notes.push(`${formatUnit(unit)}: 1차 복습이 없습니다. 수동 점검이 필요합니다.`);
-      } else if (!normalRounds.includes(2) || !normalRounds.includes(3)) {
-        notes.push(`${formatUnit(unit)}: 진도 주차가 늦어 기출픽 분할 회차 일부를 시험대비 회수로 흡수합니다.`);
-      } else if (!normalRounds.includes(4)) {
+      } else if (!normalRounds.includes(2)) {
+        notes.push(`${formatUnit(unit)}: 진도 주차가 늦어 기출픽 회차를 시험대비 회수로 흡수합니다.`);
+      } else if (!normalRounds.includes(3)) {
         notes.push(`${formatUnit(unit)}: 셀파 회차는 시험대비 기간에서 실전대비북 + 완자 마무리로 흡수합니다.`);
       }
     });
@@ -1025,6 +1004,40 @@
     </div>`;
   }
 
+  function homeworkLineForEvent(event) {
+    if (event.homeworkMessage) return event.homeworkMessage;
+    if (event.materialName === "기출픽") return `기출픽 ${event.unitCode}강 프린트 자료`;
+    if (event.materialName === "셀파") return `셀파 ${event.unitCode}강 프린트 자료`;
+    if (event.materialName === "실전대비북 + 완자 마무리") {
+      return `실전대비북 ${event.unitCode}강 + 완자 마무리 프린트 자료`;
+    }
+    return `${event.unitCode}강 ${event.studentLabel || event.materialName}`;
+  }
+
+  function weekHomeworkText(section, week) {
+    const reviews = visibleReviewEvents(week);
+    const lines = reviews.map(homeworkLineForEvent);
+
+    if (week.type === "examPrep" && week.examPrepMaterials.length) {
+      const examPrepLines = week.examPrepMaterials.map((item) => `실전대비북 ${item.unitCode}강 + 완자 마무리 프린트 자료`);
+      examPrepLines.forEach((line) => {
+        if (!lines.includes(line)) lines.push(line);
+      });
+    }
+
+    const title = `[${section.name} ${week.week}주차 숙제]`;
+    if (!lines.length) return `${title}\n숙제 없음`;
+    return `${title}\n${lines.map((line, index) => `${index + 1}. ${line}`).join("\n")}`;
+  }
+
+  function homeworkCopyHtml(section, week) {
+    const text = weekHomeworkText(section, week);
+    return `<div class="homework-copy">
+      <textarea readonly rows="5" data-homework-text="${week.week}">${escapeHtml(text)}</textarea>
+      <button type="button" class="primary wide" data-copy-homework="${week.week}">카톡 숙제 문구 복사</button>
+    </div>`;
+  }
+
   function renderPlanTable() {
     const root = document.querySelector("#planTable");
     if (!root) return;
@@ -1067,6 +1080,10 @@
             <section>
               <h3>자료</h3>
               ${shortMaterialsHtml(week)}
+            </section>
+            <section>
+              <h3>카톡 숙제</h3>
+              ${homeworkCopyHtml(section, week)}
             </section>
           </div>
         </article>`,
@@ -1267,6 +1284,14 @@
       const copyButton = event.target.closest("[data-copy-text]");
       if (copyButton) {
         copyText(copyButton.dataset.copyText, copyButton);
+        return;
+      }
+
+      const homeworkCopyButton = event.target.closest("[data-copy-homework]");
+      if (homeworkCopyButton) {
+        const container = homeworkCopyButton.closest(".homework-copy");
+        const textarea = container?.querySelector("textarea");
+        copyText(textarea?.value || "", homeworkCopyButton);
       }
     });
 

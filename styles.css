@@ -71,13 +71,18 @@ button.active {
 }
 
 input,
-select {
+select,
+textarea {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #ffffff;
   color: var(--text);
   padding: 10px 12px;
+}
+
+textarea {
+  resize: vertical;
 }
 
 label {
@@ -885,6 +890,20 @@ code {
 .anchor-details form {
   display: grid;
   gap: 8px;
+}
+
+.homework-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.homework-copy textarea {
+  min-height: 116px;
+  background: var(--panel-soft);
+  color: #0f172a;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 @media (max-width: 900px) {

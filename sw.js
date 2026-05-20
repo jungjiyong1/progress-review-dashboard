@@ -1,4 +1,4 @@
-const CACHE_NAME = "progress-review-dashboard-mobile-v1";
+const CACHE_NAME = "progress-review-dashboard-homework-v1";
 const ASSETS = [
   "./",
   "./index.html",
