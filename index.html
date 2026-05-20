@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="진도복습">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>통합과학 진도·복습 대시보드</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./course-integrated-science-1.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p>통합과학1</p>
+      <h1>진도·복습 대시보드</h1>
+    </div>
+    <span class="version">sections v1</span>
+  </header>
+
+  <nav class="tabbar" aria-label="주요 화면">
+    <button type="button" data-tab="dashboard">이번 주</button>
+    <button type="button" data-tab="table">전체표</button>
+  </nav>
+
+  <main>
+    <section id="screen-dashboard" class="screen">
+      <div id="sectionManager"></div>
+      <div id="dashboard"></div>
+    </section>
+
+    <section id="screen-table" class="screen">
+      <div id="planTable"></div>
+    </section>
+  </main>
+</body>
+</html>
