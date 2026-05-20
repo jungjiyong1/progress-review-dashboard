@@ -1039,22 +1039,22 @@
     if (event.materialName === "완자 내신만점 문제 + 실력 UP") {
       const unit = unitById(COURSE, event.unitId);
       const pages = formatWanjaPages(unit);
-      return `완자 ${event.unitCode}강${pages ? ` ${pages}` : ""} 풀기`;
+      return `완자${pages ? ` ${pages}` : ""} 풀기`;
     }
-    if (event.materialName === "기출픽") return `기출픽 ${event.unitCode}강 프린트 풀기`;
-    if (event.materialName === "셀파") return `셀파 ${event.unitCode}강 프린트 풀기`;
+    if (event.materialName === "기출픽") return "기출픽 프린트 풀기";
+    if (event.materialName === "셀파") return "셀파 프린트 풀기";
     if (event.materialName === "실전대비북 + 완자 마무리") {
-      return `실전대비북 ${event.unitCode}강 + 완자 마무리 프린트 풀기`;
+      return "실전대비북 + 완자 마무리 프린트 풀기";
     }
-    return `${event.unitCode}강 ${event.studentLabel || event.materialName}`;
+    return event.studentLabel || event.materialName;
   }
 
   function weekHomeworkText(section, week) {
     const reviews = visibleReviewEvents(week);
-    const lines = reviews.map(homeworkLineForEvent);
+    const lines = Array.from(new Set(reviews.map(homeworkLineForEvent)));
 
     if (week.type === "examPrep" && week.examPrepMaterials.length) {
-      const examPrepLines = week.examPrepMaterials.map((item) => `실전대비북 ${item.unitCode}강 + 완자 마무리 프린트 풀기`);
+      const examPrepLines = week.examPrepMaterials.map(() => "실전대비북 + 완자 마무리 프린트 풀기");
       examPrepLines.forEach((line) => {
         if (!lines.includes(line)) lines.push(line);
       });

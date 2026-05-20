@@ -1,4 +1,4 @@
-const CACHE_NAME = "progress-review-dashboard-homework-v2";
+const CACHE_NAME = "progress-review-dashboard-homework-v3";
 const ASSETS = [
   "./",
   "./index.html",
