@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="진도복습">
-  <rect width="128" height="128" rx="24" fill="#2563eb"/>
-  <path d="M34 34h60v12H34zM34 58h42v12H34zM34 82h60v12H34z" fill="#ffffff"/>
-  <circle cx="94" cy="64" r="18" fill="#fef3c7"/>
-  <path d="M86 64l6 6 12-14" fill="none" stroke="#15803d" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
